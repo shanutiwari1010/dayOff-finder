@@ -24,19 +24,14 @@ interface Country {
   officialLanguages: string[];
 }
 
-
 export default function Home() {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const {
-    data: countries = [],
-    isLoading,
-    error,
-  } = useQuery<Country[]>({
+  const { data: countries = [], error } = useQuery<Country[]>({
     queryKey: ["countries"],
     queryFn: getCountries,
   });
 
-  const { data: holidayData = [] } = useQuery({
+  const { data: holidayData = [], isLoading } = useQuery({
     queryKey: ["holidays", selectedCountry?.isoCode],
     queryFn: () => getHolidays(selectedCountry!.isoCode),
     enabled: !!selectedCountry,
@@ -109,8 +104,9 @@ export default function Home() {
           </h1>
           <Separator className="w-full bg-indigo-500 text-center max-w-16" />
           <span className="text-sm text-gray-400">2025</span>
-          <div className="flex flex-col gap-4 w-full max-w-3xl  ">
-            <HolidayCard data={holidayData} />
+          <div className="flex flex-col gap-4 w-full max-w-3xl items-center">
+            
+            <HolidayCard data={holidayData} isLoading={isLoading} />
           </div>
         </div>
       )}

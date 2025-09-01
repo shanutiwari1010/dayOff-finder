@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader } from "lucide-react";
 
 export interface Holiday {
   date: string;
@@ -13,9 +14,19 @@ export interface Holiday {
 }
 interface HolidayCardProps {
   data: Holiday[];
+  isLoading?: boolean;
 }
 
-export function HolidayCard({ data }: HolidayCardProps) {
+export function HolidayCard({ data, isLoading }: HolidayCardProps) {
+  if (isLoading) {
+    return (
+      <>
+        <Loader className="mt-8" />
+        Loading...
+      </>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <div className="text-center text-gray-400">
