@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Calendar } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { getCountries, getHolidays } from "@/lib/api/countries";
+import { getCountries, getHolidays } from "@/lib/api";
 import { HolidayCard } from "@/components/HolidayCard";
 
 interface Country {
