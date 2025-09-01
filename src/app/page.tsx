@@ -11,7 +11,9 @@ import { Label } from "@radix-ui/react-label";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Calendar } from "lucide-react";
-import { Separator } from '@/components/ui/separator';
+import { Separator } from "@/components/ui/separator";
+import { getCountries, getHolidays } from "@/lib/api/countries";
+import { HolidayCard } from "@/components/HolidayCard";
 
 interface Country {
   isoCode: string;
@@ -22,37 +24,29 @@ interface Country {
   officialLanguages: string[];
 }
 
-const fetchCountries = async (): Promise<Country[]> => {
-  const response = await fetch(
-    "https://openholidaysapi.org/Countries?languageIsoCode=DE",
-    {
-      headers: {
-        accept: "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch countries");
-  }
-
-  return response.json();
-};
 
 export default function Home() {
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const {
     data: countries = [],
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<Country[]>({
     queryKey: ["countries"],
-    queryFn: fetchCountries,
+    queryFn: getCountries,
   });
 
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const { data: holidayData = [] } = useQuery({
+    queryKey: ["holidays", selectedCountry?.isoCode],
+    queryFn: () => getHolidays(selectedCountry!.isoCode),
+    enabled: !!selectedCountry,
+  });
+
+  console.log(holidayData, "holidaydata");
+  console.log(selectedCountry);
 
   return (
-    <div className="flex flex-col items-center bg-slate-900 text-white  h-screen gap-16 py-16">
+    <div className="flex flex-col items-center text-white  h-screen gap-16 py-16">
       <div className="flex flex-col items-center gap-8">
         <h1 className="text-4xl font-bold flex flex-col items-center">
           National Holidays
@@ -107,7 +101,7 @@ export default function Home() {
       )}
 
       {selectedCountry && (
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2  w-full">
           <h1 className="text-2xl font-semibold text-center">
             National Holidays for{" "}
             {selectedCountry.name.find((n) => n.language === "DE")?.text ||
@@ -115,7 +109,10 @@ export default function Home() {
           </h1>
           <Separator className="w-full bg-indigo-500 text-center max-w-16" />
           <span className="text-sm text-gray-400">2025</span>
-        </div>  
+          <div className="flex flex-col gap-4 w-full max-w-3xl  ">
+            <HolidayCard data={holidayData} />
+          </div>
+        </div>
       )}
     </div>
   );
